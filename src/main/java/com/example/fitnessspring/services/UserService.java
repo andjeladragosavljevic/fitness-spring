@@ -5,4 +5,5 @@ import com.example.fitnessspring.models.entities.User;
 public interface UserService {
     public User findByUsername(String username);
     public User save(User user);
+    public User activateUser(String activationCode);
 }

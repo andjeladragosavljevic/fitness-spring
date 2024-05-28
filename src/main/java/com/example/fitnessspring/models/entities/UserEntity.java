@@ -37,7 +37,10 @@ public class UserEntity {
     private String email;
     @Basic
     @Column(name = "is_active", nullable = true)
-    private Byte isActive;
+    private boolean isActive;
+    @Basic
+    @Column(name="activationCode", length = 36)
+    private String activationCode;
     @OneToMany(mappedBy = "user")
     private List<ActivitylogEntity> activitylogs;
     @OneToMany(mappedBy = "user")
