@@ -47,17 +47,53 @@ public class ProgramServiceImpl implements ProgramService {
         program.setDifficultyLevel(programEntity.getDifficultyLevel().name());
         program.setDuration(programEntity.getDuration());
         program.setLocation(programEntity.getLocation());
-        program.setCategoryId(programEntity.getCategory().getId());
-        program.setUserId(programEntity.getUser().getId());
+
+        UserEntity userEntity = programEntity.getUser();
+        if (userEntity != null) {
+            User user = convertToUser(userEntity);
+            program.setInstructor(user);
+        }
+
+        CategoryEntity categoryEntity = programEntity.getCategory();
+        Category category = convertToCategory(categoryEntity);
+        program.setCategory(category);
 
         // Map images manually
         List<String> imageUrls = new ArrayList<>();
         for (ImageEntity imageEntity : programEntity.getImages()) {
             imageUrls.add(imageEntity.getUrl());
+
         }
+
+        List<SpecificAttribute> specificAttributes = new ArrayList<>();
+        for (FitnessprogramHasAttributeEntity assoc : programEntity.getAttributes()) {
+            SpecificAttribute attribute = new SpecificAttribute();
+            attribute.setName(assoc.getAttribute().getName());
+            attribute.setValue(assoc.getValue());
+            specificAttributes.add(attribute);
+        }
+        program.setSpecificAttributes(specificAttributes);
+
         program.setImages(imageUrls);
 
         return program;
+    }
+
+    private User convertToUser(UserEntity userEntity) {
+        User user = new User();
+        user.setId(userEntity.getId());
+        user.setFirstName(userEntity.getFirstName());
+        user.setLastName(userEntity.getLastName());
+        user.setEmail(userEntity.getEmail());
+        return user;
+    }
+
+    private Category convertToCategory(CategoryEntity categoryEntity) {
+        Category category = new Category();
+        category.setId(categoryEntity.getId());
+        category.setName(categoryEntity.getName());
+
+        return category;
     }
 
     public Program save(Program program) {
@@ -74,7 +110,7 @@ public class ProgramServiceImpl implements ProgramService {
 
         // Set category and user from their IDs
         CategoryEntity category = new CategoryEntity();
-        category.setId(program.getCategoryId());
+        category.setId(program.getCategory().getId());
         entity.setCategory(category);
 
         UserEntity user = new UserEntity();
@@ -112,5 +148,26 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
    // public void delete(Integer id) {}
+
+    public Page<Program> findProgramsByUserId(Pageable pageable, Integer userId) {
+        Page<FitnessProgramEntity> programsPage = programRepository.findFitnessProgramEntitiesByUserId(pageable, userId);
+        return programsPage.map(a -> modelMapper.map(a, Program.class)); //.collect(Collectors.toList());
+
+    }
+
+    public Page<Program> findProgramsByUserIdNot(Pageable pageable, Integer userId) {
+        Page<FitnessProgramEntity> programsPage = programRepository.findFitnessProgramEntityByUserIdNot(pageable, userId);
+        return programsPage.map(a -> modelMapper.map(a, Program.class));
+    }
+
+    @Override
+    public Program updateProgram(Program program) {
+        return null;
+    }
+
+    @Override
+    public void deleteProgram(Integer id) {
+        programRepository.deleteById(id);
+    }
 
 }

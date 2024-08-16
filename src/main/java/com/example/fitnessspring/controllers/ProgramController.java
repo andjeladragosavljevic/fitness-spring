@@ -2,12 +2,14 @@ package com.example.fitnessspring.controllers;
 
 
 import com.example.fitnessspring.models.entities.Program;
+import com.example.fitnessspring.models.entities.User;
 import com.example.fitnessspring.services.ProgramService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,9 +27,20 @@ public class ProgramController {
     }
 
     @GetMapping
-    public Page<Program> getPrograms(Pageable pageable) {
-        return programService.findAll(pageable);
+    public Page<Program> getPrograms(Pageable pageable, @AuthenticationPrincipal User user) {
+
+        return programService.findProgramsByUserIdNot(pageable, 41);
     }
+
+
+    @GetMapping("/my")
+    public Page<Program> getMyPrograms(Pageable pageable, @AuthenticationPrincipal User user) {
+//        return programService.getProgramsByUserId(pageable, user.getId());
+        return programService.findProgramsByUserId(pageable, 41);
+
+    }
+
+
 
     @PostMapping
     public ResponseEntity<Program> createProgram(@RequestBody Program program) {
@@ -42,6 +55,10 @@ public class ProgramController {
         return ResponseEntity.ok(programService.findById(id));
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteProgram(@PathVariable Integer id){
+        programService.deleteProgram(id);
+    }
 
 
 }

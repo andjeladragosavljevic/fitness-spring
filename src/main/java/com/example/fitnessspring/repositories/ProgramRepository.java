@@ -9,5 +9,8 @@ import org.springframework.data.domain.Pageable;
 @Repository
 public interface ProgramRepository extends JpaRepository<FitnessProgramEntity, Integer> {
 
-    Page<FitnessProgramEntity> findAll(Pageable pageable);
+//    Page<FitnessProgramEntity> findAll(Pageable pageable);
+    Page<FitnessProgramEntity> findFitnessProgramEntitiesByUserId(Pageable pageable, Integer userId);
+    Page<FitnessProgramEntity> findFitnessProgramEntityByUserIdNot(Pageable pageable, Integer userId);
+
 }
