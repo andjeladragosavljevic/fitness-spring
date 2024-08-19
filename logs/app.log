@@ -2015,3 +2015,6 @@ Consider defining a bean of type 'com.example.fitnessspring.services.ProgramServ
 2024-08-19T15:13:41.666+02:00  INFO 14052 --- [fitness-spring] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
 2024-08-19T15:13:41.672+02:00  INFO 14052 --- [fitness-spring] [restartedMain] c.e.f.FitnessSpringApplication           : Started FitnessSpringApplication in 1.279 seconds (process running for 144.907)
 2024-08-19T15:13:41.677+02:00  INFO 14052 --- [fitness-spring] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2024-08-19T15:14:20.377+02:00  INFO 14052 --- [fitness-spring] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-19T15:14:20.377+02:00  INFO 14052 --- [fitness-spring] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2024-08-19T15:14:20.379+02:00  INFO 14052 --- [fitness-spring] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
