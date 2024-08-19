@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,8 +31,11 @@ public class FitnessProgramEntity {
     @Column(name = "difficulty_level", nullable = false)
     private DifficultyLevelEnum difficultyLevel;
     @Basic
-    @Column(name = "duration", nullable = false, precision = 2)
-    private BigDecimal duration;
+    @Column(name="start_date")
+    private LocalDate startDate;
+    @Basic
+    @Column(name="end_date")
+    private LocalDate endDate;
     @Basic
     @Column(name = "location", nullable = false, length = 255)
     private String location;

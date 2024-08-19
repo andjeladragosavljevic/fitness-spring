@@ -12,7 +12,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,7 +48,8 @@ public class ProgramServiceImpl implements ProgramService {
         program.setDescription(programEntity.getDescription());
         program.setPrice(programEntity.getPrice());
         program.setDifficultyLevel(programEntity.getDifficultyLevel().name());
-        program.setDuration(programEntity.getDuration());
+        program.setStartDate(programEntity.getStartDate());
+        program.setEndDate(programEntity.getEndDate());
         program.setLocation(programEntity.getLocation());
 
         UserEntity userEntity = programEntity.getUser();
@@ -104,7 +108,8 @@ public class ProgramServiceImpl implements ProgramService {
         entity.setDescription(program.getDescription());
         entity.setPrice(program.getPrice());
         entity.setDifficultyLevel(DifficultyLevelEnum.valueOf(program.getDifficultyLevel()));
-        entity.setDuration(program.getDuration());
+        entity.setStartDate(program.getStartDate());
+        entity.setEndDate(program.getEndDate());
         entity.setLocation(program.getLocation());
         entity.setContact(program.getContact());
 
@@ -168,6 +173,29 @@ public class ProgramServiceImpl implements ProgramService {
     @Override
     public void deleteProgram(Integer id) {
         programRepository.deleteById(id);
+    }
+
+
+    public Page<Program> filterPrograms(
+            String name,
+            String description,
+            String category,
+            String difficultyLevel,
+            String location,
+            String instructor,
+            LocalDate startDate,
+            LocalDate endDate,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            String specificAttributeName,
+            String specificAttributeValue,
+            Pageable pageable) {
+
+
+        Page<FitnessProgramEntity> programsPage = programRepository.filterPrograms(name, description, category, difficultyLevel, location, instructor,
+                startDate, endDate, minPrice, maxPrice, specificAttributeName, specificAttributeValue, pageable);
+        return programsPage.map(a -> modelMapper.map(a, Program.class));
+
     }
 
 }
