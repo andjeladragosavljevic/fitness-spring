@@ -176,26 +176,15 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
 
-    public Page<Program> filterPrograms(
-            String name,
-            String description,
-            String category,
-            String difficultyLevel,
-            String location,
-            String instructor,
-            LocalDate startDate,
-            LocalDate endDate,
-            BigDecimal minPrice,
-            BigDecimal maxPrice,
-            String specificAttributeName,
-            String specificAttributeValue,
-            Pageable pageable) {
+    @Override
+    public Page<Program> filterPrograms(ProgramFilterDTO filterDTO, Pageable pageable, Integer userId, boolean isOwnPrograms) {
+        System.out.println(filterDTO);
+        List<Program> programs = programRepository.findOthersFilteredPrograms(filterDTO, pageable, userId);
 
 
-        Page<FitnessProgramEntity> programsPage = programRepository.filterPrograms(name, description, category, difficultyLevel, location, instructor,
-                startDate, endDate, minPrice, maxPrice, specificAttributeName, specificAttributeValue, pageable);
-        return programsPage.map(a -> modelMapper.map(a, Program.class));
-
+        System.out.println(programs);
+        // Pretvaranje liste u stranicu
+        return new org.springframework.data.domain.PageImpl<>(programs, pageable, programs.size());
     }
 
 }

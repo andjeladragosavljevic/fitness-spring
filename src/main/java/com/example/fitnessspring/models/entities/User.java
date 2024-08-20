@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.util.List;
 
+@NoArgsConstructor
 @Data
 public class User {
 
@@ -30,4 +31,10 @@ public class User {
 
     private String activationCode;
 
+    public User(Integer id, String firstName, String lastName, String email) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    }
 }
