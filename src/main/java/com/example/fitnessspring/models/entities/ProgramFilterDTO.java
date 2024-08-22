@@ -1,12 +1,12 @@
 package com.example.fitnessspring.models.entities;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -31,7 +31,6 @@ public class ProgramFilterDTO {
     public ProgramFilterDTO(Map<String, String> params) {
         this.name = params.get("name");
         this.description = params.get("description");
-
         this.difficultyLevel = params.get("difficultyLevel");
         this.location = params.get("location");
         this.instructor = params.get("instructor");
@@ -43,13 +42,12 @@ public class ProgramFilterDTO {
         }
 
         if (params.get("startDate") != null) {
-            ZonedDateTime zonedStartDate = ZonedDateTime.parse(params.get("startDate"), formatter);
-            this.startDate = zonedStartDate.toLocalDate();
+            this.startDate = LocalDate.parse(params.get("startDate"), formatter);
+
         }
 
         if (params.get("endDate") != null) {
-            ZonedDateTime zonedEndDate = ZonedDateTime.parse(params.get("endDate"), formatter);
-            this.endDate = zonedEndDate.toLocalDate();
+            this.endDate = LocalDate.parse(params.get("endDate"), formatter);
         }
 
 

@@ -99,6 +99,16 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom{
         if (filterDTO.getEndDate() != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get("startDate"), filterDTO.getEndDate()));
         }
+        if (filterDTO.getMinPrice() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("price"), filterDTO.getMinPrice()));
+        }
+        if (filterDTO.getMaxPrice() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("price"), filterDTO.getMaxPrice()));
+        }
+
+        if(filterDTO.getDifficultyLevel() != null) {
+            predicates.add(cb.equal(root.get("difficultyLevel"), filterDTO.getDifficultyLevel()));
+        }
 
 
 
