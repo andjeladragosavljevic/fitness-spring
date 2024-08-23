@@ -3,17 +3,13 @@ package com.example.fitnessspring.repositories;
 import com.example.fitnessspring.models.entities.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.metamodel.EntityType;
+import jakarta.persistence.criteria.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,10 +20,13 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom{
 
 
     @Override
-    public List<Program> findOthersFilteredPrograms(ProgramFilterDTO filterDTO, Pageable pageable, Integer userId) {
+    public List<Program> findFilteredPrograms(ProgramFilterDTO filterDTO, Pageable pageable, Integer userId, boolean isOwnPrograms) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Program> cq = cb.createQuery(Program.class);
         Root<FitnessProgramEntity> root = cq.from(FitnessProgramEntity.class);
+
+
+        Join<FitnessProgramEntity, FitnessprogramHasAttributeEntity> attributeJoin = root.join("attributes", JoinType.LEFT);
 
 
         cq.select(cb.construct(
@@ -52,12 +51,16 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom{
                 root.get("difficultyLevel").as(String.class),
                 root.get("price")
 
+
         ));
 
         List<Predicate> predicates = new ArrayList<>();
 
 
-        predicates.add(cb.notEqual(root.get("user").get("id"), userId));
+        if(isOwnPrograms)
+            predicates.add(cb.equal(root.get("user").get("id"), userId));
+        else
+            predicates.add(cb.notEqual(root.get("user").get("id"), userId));
 
 
         if (filterDTO.getName() != null && !filterDTO.getName().isEmpty()) {
@@ -78,7 +81,7 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom{
 
                 predicates.add(cb.and(firstNamePredicate, lastNamePredicate));
             } else {
-                // If only one part is provided, search in both firstName and lastName fields
+
                 String name = nameParts[0];
                 Predicate firstNamePredicate = cb.like(root.get("user").get("firstName"), "%" + name + "%");
                 Predicate lastNamePredicate = cb.like(root.get("user").get("lastName"), "%" + name + "%");
@@ -110,6 +113,17 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom{
             predicates.add(cb.equal(root.get("difficultyLevel"), filterDTO.getDifficultyLevel()));
         }
 
+        if (filterDTO.getSpecificAttributes() != null && !filterDTO.getSpecificAttributes().isEmpty()) {
+            for (AttributeFilter attribute : filterDTO.getSpecificAttributes()) {
+                predicates.add(cb.equal(attributeJoin.get("attribute").get("name"), attribute.getName()));
+                predicates.add(cb.equal(attributeJoin.get("value"), attribute.getValue()));
+            }
+        }
+        if(filterDTO.getStatus() != null && !filterDTO.getStatus().equals("Active")){
+            predicates.add(cb.greaterThan(root.get("endDate"), LocalDate.now()));
+            } else if (("Active").equals(filterDTO.getStatus())) {
+                predicates.add(cb.lessThan(root.get("endDate"), LocalDate.now()));
+            }
 
 
         cq.where(predicates.toArray(new Predicate[0]));
@@ -118,6 +132,14 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom{
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
 
-        return query.getResultList();
+        List<Program> programs = query.getResultList();
+        for (Program program : programs) {
+            List<String> images = em.createQuery("SELECT i.url FROM ImageEntity i WHERE i.fitnessprogram.id = :programId", String.class)
+                    .setParameter("programId", program.getId())
+                    .getResultList();
+            program.setImages(images);
+
+        }
+        return programs;
     }
 }

@@ -24,7 +24,7 @@ public class Program {
     private Category category;
     private Integer userId;
     private User instructor;
-    private List<String> images;
+    List<String> images;
     private List<SpecificAttribute> specificAttributes = new ArrayList<>();
 
     public Program(Integer id, String name, String description, User instructor, Integer userId, Category category, String contact, String location, LocalDate endDate, LocalDate startDate, String difficultyLevel, BigDecimal price) {
@@ -40,5 +40,6 @@ public class Program {
         this.startDate = startDate;
         this.difficultyLevel = difficultyLevel;
         this.price = price;
+
     }
 }

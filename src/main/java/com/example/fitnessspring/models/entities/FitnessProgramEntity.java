@@ -51,7 +51,7 @@ public class FitnessProgramEntity {
     private UserEntity user;
     @OneToMany(mappedBy = "fitnessprogram")
     private List<FitnessprogramHasAttributeEntity> attributes;
-    @OneToMany(mappedBy = "fitnessprogram", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "fitnessprogram", fetch =  FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ImageEntity> images;
     @OneToMany(mappedBy = "fitnessprogram")
     private List<ParticipationEntity> participations;

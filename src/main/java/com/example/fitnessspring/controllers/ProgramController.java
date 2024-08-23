@@ -34,17 +34,17 @@ public class ProgramController {
     }
 
 
-    @GetMapping("/my")
-    public Page<Program> getMyPrograms(Pageable pageable, @AuthenticationPrincipal User user) {
-//        return programService.getProgramsByUserId(pageable, user.getId());
-        return programService.findProgramsByUserId(pageable, 41);
+    @GetMapping("/my-programs")
+    public Page<Program> getMyPrograms(@RequestParam Map<String, String> filters, Pageable pageable) {
+        Integer userId = getCurrentUserId();  // Metoda za dobijanje trenutno prijavljenog korisnika
+        ProgramFilterDTO filterDTO = new ProgramFilterDTO(filters);
+        return programService.filterPrograms(filterDTO, pageable, userId, true);
 
     }
 
 
     @GetMapping("/other-programs")
     public Page<Program> getOtherPrograms(@RequestParam Map<String, String> filters, Pageable pageable) {
-        System.out.println(filters);
         Integer userId = getCurrentUserId();  // Metoda za dobijanje trenutno prijavljenog korisnika
         ProgramFilterDTO filterDTO = new ProgramFilterDTO(filters);
         return programService.filterPrograms(filterDTO, pageable, userId, false);

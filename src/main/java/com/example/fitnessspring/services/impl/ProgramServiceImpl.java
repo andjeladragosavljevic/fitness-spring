@@ -178,11 +178,9 @@ public class ProgramServiceImpl implements ProgramService {
 
     @Override
     public Page<Program> filterPrograms(ProgramFilterDTO filterDTO, Pageable pageable, Integer userId, boolean isOwnPrograms) {
-        System.out.println(filterDTO);
-        List<Program> programs = programRepository.findOthersFilteredPrograms(filterDTO, pageable, userId);
 
+        List<Program> programs = programRepository.findFilteredPrograms(filterDTO, pageable, userId, isOwnPrograms);
 
-        System.out.println(programs);
         // Pretvaranje liste u stranicu
         return new org.springframework.data.domain.PageImpl<>(programs, pageable, programs.size());
     }

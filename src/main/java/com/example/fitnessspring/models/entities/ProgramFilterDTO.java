@@ -9,6 +9,8 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @NoArgsConstructor
@@ -25,8 +27,8 @@ public class ProgramFilterDTO {
     private LocalDate endDate;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
-    private String specificAttributeName;
-    private String specificAttributeValue;
+    private List<AttributeFilter> specificAttributes;
+    private String status;
 
     public ProgramFilterDTO(Map<String, String> params) {
         this.name = params.get("name");
@@ -34,6 +36,7 @@ public class ProgramFilterDTO {
         this.difficultyLevel = params.get("difficultyLevel");
         this.location = params.get("location");
         this.instructor = params.get("instructor");
+        this.status = params.get("status");
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -58,7 +61,15 @@ public class ProgramFilterDTO {
             this.maxPrice = new BigDecimal(params.get("maxPrice"));
         }
 
-        this.specificAttributeName = params.get("specificAttributeName");
-        this.specificAttributeValue = params.get("specificAttributeValue");
+        this.specificAttributes = new ArrayList<>();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            String key = entry.getKey();
+            if (key.startsWith("specificAttribute_")) {
+                String attributeName = key.substring("specificAttribute_".length());
+                String attributeValue = entry.getValue();
+                this.specificAttributes.add(new AttributeFilter(attributeName, attributeValue));
+            }
+        }
+
     }
 }
