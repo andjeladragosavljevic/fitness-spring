@@ -5,6 +5,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -20,8 +22,9 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom{
 
 
     @Override
-    public List<Program> findFilteredPrograms(ProgramFilterDTO filterDTO, Pageable pageable, Integer userId, boolean isOwnPrograms) {
+    public Page<Program> findFilteredPrograms(ProgramFilterDTO filterDTO, Pageable pageable, Integer userId, boolean isOwnPrograms) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
+
         CriteriaQuery<Program> cq = cb.createQuery(Program.class);
         Root<FitnessProgramEntity> root = cq.from(FitnessProgramEntity.class);
 
@@ -129,10 +132,13 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom{
         cq.where(predicates.toArray(new Predicate[0]));
 
         TypedQuery<Program> query = em.createQuery(cq);
+        long totalElements =  query.getResultList().size();
+
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
 
         List<Program> programs = query.getResultList();
+
         for (Program program : programs) {
             List<String> images = em.createQuery("SELECT i.url FROM ImageEntity i WHERE i.fitnessprogram.id = :programId", String.class)
                     .setParameter("programId", program.getId())
@@ -140,6 +146,9 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom{
             program.setImages(images);
 
         }
-        return programs;
+        return new PageImpl<>(programs, pageable, totalElements);
     }
+
+
+
 }

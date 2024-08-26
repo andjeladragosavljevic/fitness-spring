@@ -130,7 +130,7 @@ public class ProgramServiceImpl implements ProgramService {
             image.setFitnessprogram(entity);
             images.add(image);
         }
-        System.out.println("IMAGE " + images);
+
         entity.setImages(images);
 
         // Save the entity
@@ -179,10 +179,12 @@ public class ProgramServiceImpl implements ProgramService {
     @Override
     public Page<Program> filterPrograms(ProgramFilterDTO filterDTO, Pageable pageable, Integer userId, boolean isOwnPrograms) {
 
-        List<Program> programs = programRepository.findFilteredPrograms(filterDTO, pageable, userId, isOwnPrograms);
+     return programRepository.findFilteredPrograms(filterDTO, pageable, userId, isOwnPrograms);
 
-        // Pretvaranje liste u stranicu
-        return new org.springframework.data.domain.PageImpl<>(programs, pageable, programs.size());
+
     }
+
+
+
 
 }

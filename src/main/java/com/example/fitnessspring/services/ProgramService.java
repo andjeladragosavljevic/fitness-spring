@@ -19,4 +19,5 @@ public interface ProgramService {
     public Program updateProgram(Program program);
     public void deleteProgram(Integer id);
     Page<Program> filterPrograms(ProgramFilterDTO filterDTO, Pageable pageable, Integer userId, boolean isOwnPrograms);
+
 }
