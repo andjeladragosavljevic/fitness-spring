@@ -39,7 +39,7 @@ public class UserEntity {
     @Column(name = "is_active", nullable = true)
     private boolean isActive;
     @Basic
-    @Column(name="activationCode", length = 36)
+    @Column(name="activation_code", length = 36)
     private String activationCode;
     @OneToMany(mappedBy = "user")
     private List<ActivitylogEntity> activitylogs;
