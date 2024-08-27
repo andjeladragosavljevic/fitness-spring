@@ -52,7 +52,8 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom{
                 root.get("endDate"),
                 root.get("startDate"),
                 root.get("difficultyLevel").as(String.class),
-                root.get("price")
+                root.get("price"),
+                root.get("youtubeLink")
 
 
         ));

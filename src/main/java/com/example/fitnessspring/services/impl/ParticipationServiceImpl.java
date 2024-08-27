@@ -39,7 +39,7 @@ public class ParticipationServiceImpl implements ParticipationService {
     public Participation participateInProgram(Participation participation) {
         ParticipationEntity entity = new ParticipationEntity();
         UserEntity userEntity = userRepository.findById(participation.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));
-        FitnessProgramEntity programEntity = programRepository.findById(participation.getProgramId()).orElseThrow(() -> new RuntimeException("Program not found"));
+        FitnessProgramEntity programEntity = programRepository.findById(participation.getFitnessprogramId()).orElseThrow(() -> new RuntimeException("Program not found"));
         PaymentmethodEntity paymentmethodEntity =  paymentMethodRepository.findById(participation.getPaymentMethodId()).orElseThrow(() -> new RuntimeException("Payment method not found"));
 
 

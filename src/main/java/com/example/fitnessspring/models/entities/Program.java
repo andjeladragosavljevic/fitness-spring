@@ -26,8 +26,9 @@ public class Program {
     private User instructor;
     List<String> images;
     private List<SpecificAttribute> specificAttributes = new ArrayList<>();
+    private String youtubeLink;
 
-    public Program(Integer id, String name, String description, User instructor, Integer userId, Category category, String contact, String location, LocalDate endDate, LocalDate startDate, String difficultyLevel, BigDecimal price) {
+    public Program(Integer id, String name, String description, User instructor, Integer userId, Category category, String contact, String location, LocalDate endDate, LocalDate startDate, String difficultyLevel, BigDecimal price, String youtubeLink) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -40,6 +41,7 @@ public class Program {
         this.startDate = startDate;
         this.difficultyLevel = difficultyLevel;
         this.price = price;
+        this.youtubeLink = youtubeLink;
 
     }
 }

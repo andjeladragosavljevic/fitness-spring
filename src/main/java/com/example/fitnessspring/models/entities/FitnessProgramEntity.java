@@ -43,6 +43,9 @@ public class FitnessProgramEntity {
     private String contact;
     @OneToMany(mappedBy = "fitnessprogram")
     private List<CommentEntity> comments;
+    @Basic
+    @Column(name = "youtube_link")
+    private String youtubeLink;
     @ManyToOne
     @JoinColumn(name = "Category_id", referencedColumnName = "id", nullable = false)
     private CategoryEntity category;

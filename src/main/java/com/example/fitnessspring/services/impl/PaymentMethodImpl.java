@@ -25,7 +25,6 @@ public class PaymentMethodImpl implements PaymentMethodService {
 
     @Override
     public List<PaymentMethod> getPaymentMethods() {
-        System.out.println(paymentMethodRepository.findAll());
         return  paymentMethodRepository.findAll().stream().map(pm -> modelMapper.map(
                 pm, PaymentMethod.class)
         ).collect(Collectors.toList());
