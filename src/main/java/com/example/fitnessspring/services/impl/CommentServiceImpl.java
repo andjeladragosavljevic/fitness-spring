@@ -3,26 +3,36 @@ package com.example.fitnessspring.services.impl;
 
 import com.example.fitnessspring.models.entities.*;
 import com.example.fitnessspring.repositories.CommentRepository;
+import com.example.fitnessspring.repositories.ProgramRepository;
+import com.example.fitnessspring.repositories.UserRepository;
 import com.example.fitnessspring.services.CommentService;
 import com.example.fitnessspring.util.CustomConverters;
 import jakarta.websocket.server.PathParam;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class CommentServiceImpl implements CommentService {
 
+    final
+    ProgramRepository programRepository;
+    final
+    UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final ModelMapper modelMapper;
-    public CommentServiceImpl(CommentRepository commentsRepository, ModelMapper modelMapper) {
+    public CommentServiceImpl(CommentRepository commentsRepository, ModelMapper modelMapper, ProgramRepository programRepository, UserRepository userRepository) {
         this.commentRepository = commentsRepository;
         this.modelMapper = modelMapper;
         //this.modelMapper = CustomConverters.configureModelMapper();
 
+        this.programRepository = programRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -52,17 +62,25 @@ public class CommentServiceImpl implements CommentService {
     }
     @Override
     public Comment save(Comment comment) {
-        CommentEntity entity = modelMapper.map(comment, CommentEntity.class);
+        CommentEntity entity = new CommentEntity();
 
-        UserEntity user = new UserEntity();
-        user.setId(comment.getUserId());
-        entity.setUser(user);
+        UserEntity userEntity = userRepository.findById(comment.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));
+        FitnessProgramEntity programEntity = programRepository.findById(comment.getFitnessProgramId()).orElseThrow(() -> new RuntimeException("Program not found"));
 
-        FitnessProgramEntity fitnessProgram = new FitnessProgramEntity();
-        fitnessProgram.setId(comment.getFitnessProgramId());
-        entity.setFitnessprogram(fitnessProgram);
+        entity.setFitnessprogram(programEntity);
+        entity.setCreatedAt(comment.getCreatedAt());
+        entity.setUser(userEntity);
+
+        entity.setContent(comment.getContent());
+
 
         entity = commentRepository.saveAndFlush(entity);
-        return findById(entity.getId());
+
+        return modelMapper.map(entity, Comment.class);
+    }
+
+    @Override
+    public void deleteById(Integer id){
+        commentRepository.deleteById(id);
     }
 }

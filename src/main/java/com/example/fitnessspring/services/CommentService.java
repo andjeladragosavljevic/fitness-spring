@@ -9,5 +9,6 @@ public interface CommentService {
     public List<Comment> findByFitnessProgramId(Integer fitnessProgramId);
     public Comment save(Comment comment);
     public Comment findById(Integer id);
+    public void deleteById(Integer id);
 
 }

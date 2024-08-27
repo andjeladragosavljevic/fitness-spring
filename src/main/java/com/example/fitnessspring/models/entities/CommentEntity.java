@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Data
@@ -28,5 +29,10 @@ public class CommentEntity {
     @ManyToOne
     @JoinColumn(name = "fitness_program_id", referencedColumnName = "id", nullable = false)
     private FitnessProgramEntity fitnessprogram;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = Timestamp.valueOf(LocalDateTime.now());
+    }
 
 }

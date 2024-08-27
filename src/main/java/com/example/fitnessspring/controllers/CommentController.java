@@ -31,4 +31,9 @@ public class CommentController {
     public ResponseEntity<Comment> createComment(@RequestBody Comment comment) {
         return ResponseEntity.ok(commentService.save(comment));
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteComment(@PathVariable Integer id){
+        commentService.deleteById(id);
+    }
 }

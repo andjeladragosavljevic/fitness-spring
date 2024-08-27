@@ -6,19 +6,13 @@ import com.example.fitnessspring.repositories.ProgramRepository;
 import com.example.fitnessspring.services.ProgramService;
 import com.example.fitnessspring.util.CustomConverters;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 public class ProgramServiceImpl implements ProgramService {
