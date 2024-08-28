@@ -71,6 +71,12 @@ public class ProgramController {
         programService.deleteProgram(id);
     }
 
+    @PutMapping("{id}")
+    public ResponseEntity<Program> updateProgram(@PathVariable Integer id, @RequestBody Program program){
+        return ResponseEntity.ok( programService.updateProgram(id, program));
+    }
+
+
 
 
 }

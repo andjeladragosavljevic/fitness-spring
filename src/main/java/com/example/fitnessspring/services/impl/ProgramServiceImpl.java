@@ -127,39 +127,13 @@ public class ProgramServiceImpl implements ProgramService {
         entity.setUser(user);
 
 
-        List<ImageEntity> images = new ArrayList<>();
-        for (String imageUrl : program.getImages()) {
-            ImageEntity image = new ImageEntity();
-            image.setUrl(imageUrl);
-            image.setFitnessprogram(entity);
-            images.add(image);
-        }
+        List<ImageEntity> images = updateImages(program, entity);
         entity.setImages(images);
 
-        Map<String, AttributeEntity> attributeEntityMap = attributeRepository.findByNameIn(
-                        program.getSpecificAttributes().stream()
-                                .map(SpecificAttribute::getName)
-                                .collect(Collectors.toList())
-                ).stream()
-                .collect(Collectors.toMap(AttributeEntity::getName, Function.identity()));
 
 
-        List<FitnessprogramHasAttributeEntity> specificAttributes = new ArrayList<>();
 
-        for (SpecificAttribute attribute : program.getSpecificAttributes()) {
-            AttributeEntity attributeEntity = attributeEntityMap.get(attribute.getName());
-
-            if (attributeEntity == null) {
-                throw new EntityNotFoundException("Attribute with name " + attribute.getName() + " not found");
-            }
-
-            FitnessprogramHasAttributeEntity fitnessprogramHasAttributeEntity = new FitnessprogramHasAttributeEntity();
-
-            fitnessprogramHasAttributeEntity.setAttribute(attributeEntity);
-            fitnessprogramHasAttributeEntity.setValue(attribute.getValue());
-            fitnessprogramHasAttributeEntity.setFitnessprogram(entity);
-            specificAttributes.add(fitnessprogramHasAttributeEntity);
-        }
+        List<FitnessprogramHasAttributeEntity> specificAttributes = updateSpecificAttributes(program, entity);
         entity.setAttributes(specificAttributes);
 
 
@@ -167,6 +141,8 @@ public class ProgramServiceImpl implements ProgramService {
         return findById(entity.getId());
 
     }
+
+
 
 
     public Page<Program> findProgramsByUserId(Pageable pageable, Integer userId) {
@@ -181,8 +157,69 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
     @Override
-    public Program updateProgram(Program program) {
-        return null;
+    public Program updateProgram(Integer id, Program program) {
+        FitnessProgramEntity existingProgram = programRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        existingProgram.setName(program.getName());
+        existingProgram.setDescription(program.getDescription());
+        existingProgram.setPrice(program.getPrice());
+        existingProgram.setDifficultyLevel(DifficultyLevelEnum.valueOf(program.getDifficultyLevel()));
+        existingProgram.setStartDate(program.getStartDate());
+        existingProgram.setEndDate(program.getEndDate());
+        existingProgram.setLocation(program.getLocation());
+        existingProgram.setContact(program.getContact());
+        existingProgram.setYoutubeLink(program.getYoutubeLink());
+
+
+        List<FitnessprogramHasAttributeEntity> specificAttributes = updateSpecificAttributes(program, existingProgram);
+        existingProgram.setAttributes(specificAttributes);
+
+        List<ImageEntity> images = updateImages(program, existingProgram);
+        existingProgram.setImages(images);
+
+
+        FitnessProgramEntity savedProgram = programRepository.saveAndFlush(existingProgram);
+
+        return findById(savedProgram.getId());
+    }
+
+    private List<FitnessprogramHasAttributeEntity> updateSpecificAttributes(Program program, FitnessProgramEntity entity) {
+        List<String> attributeNames = program.getSpecificAttributes().stream()
+                .map(SpecificAttribute::getName)
+                .collect(Collectors.toList());
+
+        List<AttributeEntity> attributeEntities = attributeRepository.findByNameIn(attributeNames);
+
+        Map<String, AttributeEntity> attributeEntityMap = attributeEntities.stream()
+                .collect(Collectors.toMap(AttributeEntity::getName, Function.identity()));
+
+        List<FitnessprogramHasAttributeEntity> specificAttributes = new ArrayList<>();
+        for (SpecificAttribute attribute : program.getSpecificAttributes()) {
+            AttributeEntity attributeEntity = attributeEntityMap.get(attribute.getName());
+            if (attributeEntity == null) {
+                throw new EntityNotFoundException("Attribute with name " + attribute.getName() + " not found");
+            }
+
+            FitnessprogramHasAttributeEntity fitnessprogramHasAttributeEntity = new FitnessprogramHasAttributeEntity();
+            fitnessprogramHasAttributeEntity.setAttribute(attributeEntity);
+            fitnessprogramHasAttributeEntity.setValue(attribute.getValue());
+            fitnessprogramHasAttributeEntity.setFitnessprogram(entity);
+            specificAttributes.add(fitnessprogramHasAttributeEntity);
+        }
+        return specificAttributes;
+    }
+
+
+    private List<ImageEntity> updateImages(Program program, FitnessProgramEntity entity) {
+        List<ImageEntity> images = new ArrayList<>();
+        for (String imageUrl : program.getImages()) {
+            ImageEntity image = new ImageEntity();
+            image.setUrl(imageUrl);
+            image.setFitnessprogram(entity);
+            images.add(image);
+        }
+        return images;
     }
 
     @Override

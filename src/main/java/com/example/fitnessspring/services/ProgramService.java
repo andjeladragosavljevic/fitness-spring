@@ -16,7 +16,7 @@ public interface ProgramService {
     public Program save(Program program);
     public Page<Program> findProgramsByUserId(Pageable pageable, Integer userId);
     public Page<Program> findProgramsByUserIdNot(Pageable pageable, Integer userId);
-    public Program updateProgram(Program program);
+    public Program updateProgram(Integer id, Program program);
     public void deleteProgram(Integer id);
     Page<Program> filterPrograms(ProgramFilterDTO filterDTO, Pageable pageable, Integer userId, boolean isOwnPrograms);
 
