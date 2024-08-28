@@ -52,7 +52,7 @@ public class FitnessProgramEntity {
     @ManyToOne
     @JoinColumn(name = "User_id", referencedColumnName = "id", nullable = false)
     private UserEntity user;
-    @OneToMany(mappedBy = "fitnessprogram")
+    @OneToMany(mappedBy = "fitnessprogram", cascade = CascadeType.ALL)
     private List<FitnessprogramHasAttributeEntity> attributes;
     @OneToMany(mappedBy = "fitnessprogram", fetch =  FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ImageEntity> images;

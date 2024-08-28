@@ -36,7 +36,6 @@ public class Program {
         this.instructor = instructor;
         this.userId = userId;
         this.category = category;
-
         this.contact = contact;
         this.location = location;
         this.endDate = endDate;

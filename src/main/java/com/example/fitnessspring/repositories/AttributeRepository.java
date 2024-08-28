@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface AttributeRepository extends JpaRepository<AttributeEntity, Integer> {
     public List<AttributeEntity> findAttributeEntitiesByCategory_Id (Integer categoryId);
+    public AttributeEntity findAttributeEntityByName(String name);
+    public List<AttributeEntity> findByNameIn(List<String> names);
 }

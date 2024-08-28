@@ -2,9 +2,11 @@ package com.example.fitnessspring.services.impl;
 
 import com.example.fitnessspring.enums.DifficultyLevelEnum;
 import com.example.fitnessspring.models.entities.*;
+import com.example.fitnessspring.repositories.AttributeRepository;
 import com.example.fitnessspring.repositories.ProgramRepository;
 import com.example.fitnessspring.services.ProgramService;
 import com.example.fitnessspring.util.CustomConverters;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,16 +14,24 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Service
 public class ProgramServiceImpl implements ProgramService {
+
+    final
+    AttributeRepository attributeRepository;
+
     private final ModelMapper modelMapper;
     private final ProgramRepository programRepository;
 
-    public ProgramServiceImpl(ModelMapper modelMapper, ProgramRepository programRepository) {
+    public ProgramServiceImpl(ModelMapper modelMapper, ProgramRepository programRepository, AttributeRepository attributeRepository) {
         this.modelMapper = CustomConverters.configureModelMapper();
         this.programRepository = programRepository;
+        this.attributeRepository = attributeRepository;
     }
 
 
@@ -35,7 +45,7 @@ public class ProgramServiceImpl implements ProgramService {
         FitnessProgramEntity programEntity = programRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Program not found"));
 
-        // Manual mapping from FitnessProgramEntity to Program
+
         Program program = new Program();
         program.setId(programEntity.getId());
         program.setName(programEntity.getName());
@@ -56,21 +66,21 @@ public class ProgramServiceImpl implements ProgramService {
         Category category = convertToCategory(categoryEntity);
         program.setCategory(category);
 
-        // Map images manually
+
         List<String> imageUrls = new ArrayList<>();
         for (ImageEntity imageEntity : programEntity.getImages()) {
             imageUrls.add(imageEntity.getUrl());
 
         }
 
-       /* List<SpecificAttribute> specificAttributes = new ArrayList<>();
+        List<SpecificAttribute> specificAttributes = new ArrayList<>();
         for (FitnessprogramHasAttributeEntity assoc : programEntity.getAttributes()) {
             SpecificAttribute attribute = new SpecificAttribute();
             attribute.setName(assoc.getAttribute().getName());
             attribute.setValue(assoc.getValue());
             specificAttributes.add(attribute);
         }
-        program.setSpecificAttributes(specificAttributes);*/
+        program.setSpecificAttributes(specificAttributes);
 
         program.setImages(imageUrls);
 
@@ -95,7 +105,6 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
     public Program save(Program program) {
-        // Manual mapping of images
         FitnessProgramEntity entity = new FitnessProgramEntity();
         entity.setId(program.getId());
         entity.setName(program.getName());
@@ -106,8 +115,9 @@ public class ProgramServiceImpl implements ProgramService {
         entity.setEndDate(program.getEndDate());
         entity.setLocation(program.getLocation());
         entity.setContact(program.getContact());
+        entity.setYoutubeLink(program.getYoutubeLink());
 
-        // Set category and user from their IDs
+
         CategoryEntity category = new CategoryEntity();
         category.setId(program.getCategoryId());
         entity.setCategory(category);
@@ -116,7 +126,7 @@ public class ProgramServiceImpl implements ProgramService {
         user.setId(program.getUserId());
         entity.setUser(user);
 
-        // Map images
+
         List<ImageEntity> images = new ArrayList<>();
         for (String imageUrl : program.getImages()) {
             ImageEntity image = new ImageEntity();
@@ -124,29 +134,40 @@ public class ProgramServiceImpl implements ProgramService {
             image.setFitnessprogram(entity);
             images.add(image);
         }
-
         entity.setImages(images);
 
-        // Save the entity
+        Map<String, AttributeEntity> attributeEntityMap = attributeRepository.findByNameIn(
+                        program.getSpecificAttributes().stream()
+                                .map(SpecificAttribute::getName)
+                                .collect(Collectors.toList())
+                ).stream()
+                .collect(Collectors.toMap(AttributeEntity::getName, Function.identity()));
+
+
+        List<FitnessprogramHasAttributeEntity> specificAttributes = new ArrayList<>();
+
+        for (SpecificAttribute attribute : program.getSpecificAttributes()) {
+            AttributeEntity attributeEntity = attributeEntityMap.get(attribute.getName());
+
+            if (attributeEntity == null) {
+                throw new EntityNotFoundException("Attribute with name " + attribute.getName() + " not found");
+            }
+
+            FitnessprogramHasAttributeEntity fitnessprogramHasAttributeEntity = new FitnessprogramHasAttributeEntity();
+
+            fitnessprogramHasAttributeEntity.setAttribute(attributeEntity);
+            fitnessprogramHasAttributeEntity.setValue(attribute.getValue());
+            fitnessprogramHasAttributeEntity.setFitnessprogram(entity);
+            specificAttributes.add(fitnessprogramHasAttributeEntity);
+        }
+        entity.setAttributes(specificAttributes);
+
+
         entity = programRepository.saveAndFlush(entity);
         return findById(entity.getId());
-//        FitnessProgramEntity entity = modelMapper.map(program, FitnessProgramEntity.class);
-//
-//
-//        List<ImageEntity> images = new ArrayList<>();
-//        for (String imageUrl : program.getImages()) {
-//            ImageEntity image = new ImageEntity();
-//            image.setUrl(imageUrl);
-//            image.setFitnessprogram(entity);
-//            images.add(image);
-//        }
-//
-//        entity.setImages(images);
-//        entity = programRepository.saveAndFlush(entity);
-//        return findById(entity.getId());
+
     }
 
-   // public void delete(Integer id) {}
 
     public Page<Program> findProgramsByUserId(Pageable pageable, Integer userId) {
         Page<FitnessProgramEntity> programsPage = programRepository.findFitnessProgramEntitiesByUserId(pageable, userId);
@@ -172,10 +193,7 @@ public class ProgramServiceImpl implements ProgramService {
 
     @Override
     public Page<Program> filterPrograms(ProgramFilterDTO filterDTO, Pageable pageable, Integer userId, boolean isOwnPrograms) {
-
      return programRepository.findFilteredPrograms(filterDTO, pageable, userId, isOwnPrograms);
-
-
     }
 
 

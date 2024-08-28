@@ -61,8 +61,6 @@ public class ProgramController {
         return ResponseEntity.ok(programService.save(program));
     }
 
-
-
     @GetMapping("/{id}")
     public ResponseEntity<Program> getProgram(@PathVariable Integer id) {
         return ResponseEntity.ok(programService.findById(id));
