@@ -22,6 +22,7 @@ public class Program {
     private String location;
     private String contact;
     private Category category;
+    private Integer categoryId;
     private Integer userId;
     private User instructor;
     List<String> images;
@@ -35,6 +36,7 @@ public class Program {
         this.instructor = instructor;
         this.userId = userId;
         this.category = category;
+
         this.contact = contact;
         this.location = location;
         this.endDate = endDate;

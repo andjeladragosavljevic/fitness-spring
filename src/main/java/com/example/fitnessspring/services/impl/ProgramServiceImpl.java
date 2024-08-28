@@ -63,14 +63,14 @@ public class ProgramServiceImpl implements ProgramService {
 
         }
 
-        List<SpecificAttribute> specificAttributes = new ArrayList<>();
+       /* List<SpecificAttribute> specificAttributes = new ArrayList<>();
         for (FitnessprogramHasAttributeEntity assoc : programEntity.getAttributes()) {
             SpecificAttribute attribute = new SpecificAttribute();
             attribute.setName(assoc.getAttribute().getName());
             attribute.setValue(assoc.getValue());
             specificAttributes.add(attribute);
         }
-        program.setSpecificAttributes(specificAttributes);
+        program.setSpecificAttributes(specificAttributes);*/
 
         program.setImages(imageUrls);
 
@@ -109,7 +109,7 @@ public class ProgramServiceImpl implements ProgramService {
 
         // Set category and user from their IDs
         CategoryEntity category = new CategoryEntity();
-        category.setId(program.getCategory().getId());
+        category.setId(program.getCategoryId());
         entity.setCategory(category);
 
         UserEntity user = new UserEntity();
