@@ -26,6 +26,7 @@ public class Program {
     private Integer userId;
     private User instructor;
     List<String> images;
+    List<String> removedImages;
     private List<SpecificAttribute> specificAttributes = new ArrayList<>();
     private String youtubeLink;
 

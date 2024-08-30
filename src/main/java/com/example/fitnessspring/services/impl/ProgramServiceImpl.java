@@ -3,11 +3,13 @@ package com.example.fitnessspring.services.impl;
 import com.example.fitnessspring.enums.DifficultyLevelEnum;
 import com.example.fitnessspring.models.entities.*;
 import com.example.fitnessspring.repositories.AttributeRepository;
+import com.example.fitnessspring.repositories.ImageRepository;
 import com.example.fitnessspring.repositories.ProgramRepository;
 import com.example.fitnessspring.services.ProgramService;
 import com.example.fitnessspring.util.CustomConverters;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,15 +25,18 @@ import java.util.stream.Collectors;
 public class ProgramServiceImpl implements ProgramService {
 
     final
+    ImageRepository imageRepository;
+    final
     AttributeRepository attributeRepository;
 
     private final ModelMapper modelMapper;
     private final ProgramRepository programRepository;
 
-    public ProgramServiceImpl(ModelMapper modelMapper, ProgramRepository programRepository, AttributeRepository attributeRepository) {
+    public ProgramServiceImpl(ModelMapper modelMapper, ProgramRepository programRepository, AttributeRepository attributeRepository, ImageRepository imageRepository) {
         this.modelMapper = CustomConverters.configureModelMapper();
         this.programRepository = programRepository;
         this.attributeRepository = attributeRepository;
+        this.imageRepository = imageRepository;
     }
 
 
@@ -174,6 +179,21 @@ public class ProgramServiceImpl implements ProgramService {
 
         List<FitnessprogramHasAttributeEntity> specificAttributes = updateSpecificAttributes(program, existingProgram);
         existingProgram.setAttributes(specificAttributes);
+
+        List<String> removedImages = program.getRemovedImages();
+        System.out.println(removedImages);
+        if (removedImages != null && !removedImages.isEmpty()) {
+            List<ImageEntity> imagesToRemove = existingProgram.getImages().stream()
+                    .filter(image -> removedImages.contains(image.getUrl()))
+                    .toList();
+            System.out.println(imagesToRemove);
+            for (ImageEntity image : imagesToRemove) {
+                existingProgram.getImages().remove(image);
+                imageRepository.delete(image);
+
+            }
+        }
+
 
         List<ImageEntity> images = updateImages(program, existingProgram);
         existingProgram.setImages(images);
