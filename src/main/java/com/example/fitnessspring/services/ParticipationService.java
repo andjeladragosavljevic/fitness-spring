@@ -9,5 +9,5 @@ import java.util.List;
 @Service
 public interface ParticipationService {
     public Participation participateInProgram(Participation participation);
-    public List<Participation> getUserParticipations(Integer userId);
+    public List<Participation> getUserParticipations(Integer userId, boolean current);
 }

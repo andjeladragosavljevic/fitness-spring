@@ -123,11 +123,12 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom{
                 predicates.add(cb.equal(attributeJoin.get("value"), attribute.getValue()));
             }
         }
-        if(filterDTO.getStatus() != null && !filterDTO.getStatus().equals("Active")){
+        if (filterDTO.getStatus() != null && filterDTO.getStatus().equals("Active")) {
             predicates.add(cb.greaterThan(root.get("endDate"), LocalDate.now()));
-            } else if (("Active").equals(filterDTO.getStatus())) {
-                predicates.add(cb.lessThan(root.get("endDate"), LocalDate.now()));
-            }
+        } else if ("Completed".equals(filterDTO.getStatus())) {
+            predicates.add(cb.lessThan(root.get("endDate"), LocalDate.now()));
+        }
+
 
 
         cq.where(predicates.toArray(new Predicate[0]));

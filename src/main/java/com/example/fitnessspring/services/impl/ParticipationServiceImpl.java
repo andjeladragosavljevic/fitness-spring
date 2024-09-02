@@ -9,6 +9,7 @@ import com.example.fitnessspring.services.ParticipationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,18 +63,31 @@ public class ParticipationServiceImpl implements ParticipationService {
     }
 
     @Override
-    public List<Participation> getUserParticipations(Integer userId) {
-        List<ParticipationEntity> participations = participationRepository.getParticipationEntitiesByUserId(userId);
-        return participations.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+    public List<Participation> getUserParticipations(Integer userId, boolean current) {
+//        List<ParticipationEntity> participations = participationRepository.getParticipationEntitiesByUserId(userId);
+//        return participations.stream()
+//                .map(this::convertToDto)
+//                .collect(Collectors.toList());
+
+        LocalDate today = LocalDate.now();
+        if (current) {
+            return participationRepository.findByUserIdAndFitnessprogramEndDateAfter(userId, today)
+                    .stream().map(this::convertToDto).collect(Collectors.toList());
+        } else {
+            return participationRepository.findByUserIdAndFitnessprogramEndDateBefore(userId, today)
+                    .stream().map(this::convertToDto).collect(Collectors.toList());
+        }
 
     }
 
     private Participation convertToDto(ParticipationEntity participation) {
         Participation dto = new Participation();
         Program program = new Program();
-        program.setName(participation.getFitnessprogram().getName());
+        FitnessProgramEntity fitnessProgramEntity = participation.getFitnessprogram();
+        program.setName(fitnessProgramEntity.getName());
+        program.setStartDate(fitnessProgramEntity.getStartDate());
+        program.setEndDate(fitnessProgramEntity.getEndDate());
+        program.setId(fitnessProgramEntity.getId());
         dto.setFitnessprogram(program);
         dto.setParticipationTime(participation.getParticipationTime());
 //        dto.setParticipationDate(participation.getParticipationDate());

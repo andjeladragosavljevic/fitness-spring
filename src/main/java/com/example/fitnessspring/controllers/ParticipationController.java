@@ -26,8 +26,10 @@ public class ParticipationController {
     }
 
 
-    @GetMapping ("/user/{id}")
-    ResponseEntity<List<Participation>> getUserParticipations(@PathVariable Integer id){
-        return  ResponseEntity.ok(participationService.getUserParticipations(id));
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Participation>> getUserParticipations(
+            @PathVariable Integer userId,
+            @RequestParam(required = false) boolean current) {
+        return ResponseEntity.ok(participationService.getUserParticipations(userId, current));
     }
 }
