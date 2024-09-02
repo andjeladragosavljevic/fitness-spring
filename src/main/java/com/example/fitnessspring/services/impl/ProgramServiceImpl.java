@@ -181,22 +181,34 @@ public class ProgramServiceImpl implements ProgramService {
         existingProgram.setAttributes(specificAttributes);
 
         List<String> removedImages = program.getRemovedImages();
-        System.out.println(removedImages);
+
         if (removedImages != null && !removedImages.isEmpty()) {
             List<ImageEntity> imagesToRemove = existingProgram.getImages().stream()
                     .filter(image -> removedImages.contains(image.getUrl()))
                     .toList();
-            System.out.println(imagesToRemove);
-            for (ImageEntity image : imagesToRemove) {
+
+            imagesToRemove.forEach(image -> {
                 existingProgram.getImages().remove(image);
                 imageRepository.delete(image);
+            });
+        }
 
+        List<String> newImages = program.getImages();
+        List<ImageEntity> updatedImages = existingProgram.getImages();
+
+        for (String imageUrl : newImages) {
+            boolean imageExists = existingProgram.getImages().stream()
+                    .anyMatch(image -> image.getUrl().equals(imageUrl));
+
+            if (!imageExists) {
+                ImageEntity newImage = new ImageEntity();
+                newImage.setUrl(imageUrl);
+                newImage.setFitnessprogram(existingProgram);
+                updatedImages.add(newImage);
             }
         }
 
-
-        List<ImageEntity> images = updateImages(program, existingProgram);
-        existingProgram.setImages(images);
+        existingProgram.setImages(updatedImages);
 
 
         FitnessProgramEntity savedProgram = programRepository.saveAndFlush(existingProgram);
