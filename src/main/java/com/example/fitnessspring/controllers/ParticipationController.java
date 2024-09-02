@@ -7,8 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/participation")
+@RequestMapping("/api/participations")
 @CrossOrigin(origins = "http://localhost:4200")
 public class ParticipationController {
     private final ParticipationService participationService;
@@ -21,5 +23,11 @@ public class ParticipationController {
     public ResponseEntity<Participation> participate(@RequestBody Participation participation) {
        return ResponseEntity.ok(participationService.participateInProgram(participation));
 
+    }
+
+
+    @GetMapping ("/user/{id}")
+    ResponseEntity<List<Participation>> getUserParticipations(@PathVariable Integer id){
+        return  ResponseEntity.ok(participationService.getUserParticipations(id));
     }
 }

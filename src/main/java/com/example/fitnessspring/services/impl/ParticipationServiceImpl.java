@@ -9,6 +9,9 @@ import com.example.fitnessspring.services.ParticipationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class ParticipationServiceImpl implements ParticipationService {
 
@@ -42,6 +45,7 @@ public class ParticipationServiceImpl implements ParticipationService {
         FitnessProgramEntity programEntity = programRepository.findById(participation.getFitnessprogramId()).orElseThrow(() -> new RuntimeException("Program not found"));
         PaymentmethodEntity paymentmethodEntity =  paymentMethodRepository.findById(participation.getPaymentMethodId()).orElseThrow(() -> new RuntimeException("Payment method not found"));
 
+        System.out.print(userEntity.getId());
 
         if (participationRepository.existsByUserAndFitnessprogram(userEntity, programEntity)) {
             throw new RuntimeException("User already participating in this program");
@@ -56,4 +60,27 @@ public class ParticipationServiceImpl implements ParticipationService {
 
         return modelMapper.map(entity, Participation.class);
     }
+
+    @Override
+    public List<Participation> getUserParticipations(Integer userId) {
+        List<ParticipationEntity> participations = participationRepository.getParticipationEntitiesByUserId(userId);
+        return participations.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+
+    }
+
+    private Participation convertToDto(ParticipationEntity participation) {
+        Participation dto = new Participation();
+        Program program = new Program();
+        program.setName(participation.getFitnessprogram().getName());
+        dto.setFitnessprogram(program);
+        dto.setParticipationTime(participation.getParticipationTime());
+//        dto.setParticipationDate(participation.getParticipationDate());
+        dto.setPaymentMethodId(participation.getPaymentmethod().getId());
+        dto.setPaymentMethod(modelMapper.map(participation.getPaymentmethod(), PaymentMethod.class));
+
+        return dto;
+    }
+
 }

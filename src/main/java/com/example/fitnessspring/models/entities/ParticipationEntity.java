@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Data
@@ -26,5 +27,12 @@ public class ParticipationEntity {
     @ManyToOne
     @JoinColumn(name = "payment_method_id", referencedColumnName = "id", nullable = false)
     private PaymentmethodEntity paymentmethod;
+
+
+    @PrePersist
+    protected void onCreate() {
+        participationTime = Timestamp.valueOf(LocalDateTime.now());
+    }
+
 
 }
