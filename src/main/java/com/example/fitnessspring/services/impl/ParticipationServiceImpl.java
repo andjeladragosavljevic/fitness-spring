@@ -90,7 +90,6 @@ public class ParticipationServiceImpl implements ParticipationService {
         program.setId(fitnessProgramEntity.getId());
         dto.setFitnessprogram(program);
         dto.setParticipationTime(participation.getParticipationTime());
-//        dto.setParticipationDate(participation.getParticipationDate());
         dto.setPaymentMethodId(participation.getPaymentmethod().getId());
         dto.setPaymentMethod(modelMapper.map(participation.getPaymentmethod(), PaymentMethod.class));
 

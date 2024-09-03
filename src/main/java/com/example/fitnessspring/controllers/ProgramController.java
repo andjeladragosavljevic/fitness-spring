@@ -52,7 +52,7 @@ public class ProgramController {
 
     private Integer getCurrentUserId() {
         // Implementacija za dobijanje ID-a trenutno prijavljenog korisnika
-        return 31; // Placeholder
+        return 41; // Placeholder
     }
 
     @PostMapping
