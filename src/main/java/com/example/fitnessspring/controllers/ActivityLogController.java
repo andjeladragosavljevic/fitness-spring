@@ -26,11 +26,6 @@ public class ActivityLogController {
         return activityLogService.getAllActivitiesByUserId(userId);
     }
 
-    @PutMapping("/{id}")
-    public ActivityLog updateActivityLog(@PathVariable Integer id, @RequestBody ActivityLog activityLog) {
-        return activityLogService.updateActivityLog(id, activityLog);
-    }
-
     @DeleteMapping("/{id}")
     public void deleteActivityLog(@PathVariable Integer id) {
         activityLogService.deleteActivityLog(id);
