@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
-import java.util.Objects;
 
 @Data
 @Entity
@@ -47,10 +46,10 @@ public class UserEntity {
     private List<CommentEntity> comments;
     @OneToMany(mappedBy = "user")
     private List<FitnessProgramEntity> fitnessprograms;
-    @OneToMany(mappedBy = "senderId")
+    @OneToMany(mappedBy = "sender")
     private List<MessageEntity> sentMessages;
-    @OneToMany(mappedBy = "recieverId")
-    private List<MessageEntity> recievedMessages;
+    @OneToMany(mappedBy = "receiver")
+    private List<MessageEntity> receivedMessages;
     @OneToMany(mappedBy = "user")
     private List<MessagetoadvisorEntity> messagetoadvisors;
     @OneToMany(mappedBy = "user")

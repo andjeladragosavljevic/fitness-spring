@@ -23,10 +23,10 @@ public class MessageEntity {
     private Boolean isRead;
     @ManyToOne
     @JoinColumn(name = "sender_user_id", referencedColumnName = "id", nullable = false)
-    private UserEntity senderId;
+    private UserEntity sender;
     @ManyToOne
-    @JoinColumn(name = "reciever_user_id", referencedColumnName = "id", nullable = false)
-    private UserEntity recieverId;
+    @JoinColumn(name = "receiver_user_id", referencedColumnName = "id", nullable = false)
+    private UserEntity receiver;
 
     @Basic
     @Column(name = "is_read", nullable = true)

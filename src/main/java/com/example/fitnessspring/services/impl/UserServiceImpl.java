@@ -9,7 +9,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -57,5 +59,9 @@ public class UserServiceImpl implements UserService {
         entity.setActivationCode(null);
         userRepository.saveAndFlush(entity);return findById(entity.getId());
 
+    }
+
+    public List<User> getAvailableUsersForCommunication(Integer currentUserId) {
+        return userRepository.findAllByIdNot(currentUserId).stream().map(u -> modelMapper.map(u, User.class)).collect(Collectors.toList());
     }
 }
