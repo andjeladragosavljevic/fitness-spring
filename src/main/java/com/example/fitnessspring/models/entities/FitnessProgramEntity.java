@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,6 +48,9 @@ public class FitnessProgramEntity {
     @Basic
     @Column(name = "youtube_link")
     private String youtubeLink;
+    @Basic
+    @Column(name = "created_at", nullable = true)
+    private LocalDateTime createdAt;
     @ManyToOne
     @JoinColumn(name = "Category_id", referencedColumnName = "id", nullable = false)
     private CategoryEntity category;
@@ -58,5 +63,10 @@ public class FitnessProgramEntity {
     private List<ImageEntity> images;
     @OneToMany(mappedBy = "fitnessprogram")
     private List<ParticipationEntity> participations;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
 }

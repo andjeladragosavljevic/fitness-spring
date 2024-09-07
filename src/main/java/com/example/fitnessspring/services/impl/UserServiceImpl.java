@@ -57,7 +57,8 @@ public class UserServiceImpl implements UserService {
         UserEntity entity = userRepository.findByActivationCode(activationCode);
         entity.setActive(true);
         entity.setActivationCode(null);
-        userRepository.saveAndFlush(entity);return findById(entity.getId());
+        userRepository.saveAndFlush(entity);
+        return findById(entity.getId());
 
     }
 
