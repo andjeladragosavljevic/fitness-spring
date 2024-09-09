@@ -5,6 +5,7 @@ import com.example.fitnessspring.models.entities.*;
 import com.example.fitnessspring.repositories.ActivityLogRepository;
 import com.example.fitnessspring.repositories.UserRepository;
 import com.example.fitnessspring.services.ActivityLogService;
+import com.example.fitnessspring.services.LogService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,13 +16,14 @@ import java.util.stream.Collectors;
 @Service
 public class ActivityLogServiceImpl implements ActivityLogService {
     private final ActivityLogRepository activityLogRepository;
-
+    private final LogService logService;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
 
-    public ActivityLogServiceImpl(ActivityLogRepository activityLogRepository, UserRepository userRepository, ModelMapper modelMapper) {
+    public ActivityLogServiceImpl(ActivityLogRepository activityLogRepository, LogService logService, UserRepository userRepository, ModelMapper modelMapper) {
         this.activityLogRepository = activityLogRepository;
+        this.logService = logService;
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
     }
@@ -40,10 +42,13 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
        activitylogEntity =  activityLogRepository.save(activitylogEntity);
 
-       return modelMapper.map(activitylogEntity, ActivityLog.class);
+        logService.log("INFO", "ActivityLog added: " + activitylogEntity.getId());
+
+        return modelMapper.map(activitylogEntity, ActivityLog.class);
     }
 
     public List<ActivityLog> getAllActivitiesByUserId(Integer userId) {
+        logService.log("INFO", "Fetched activities for user: " + userId);
         return activityLogRepository.findByUserId(userId)
                 .stream().map(this::convertToDto).collect(Collectors.toList());
     }
@@ -57,7 +62,6 @@ public class ActivityLogServiceImpl implements ActivityLogService {
         dto.setExerciseType(activitylogEntity.getExerciseType());
         dto.setDuration(activitylogEntity.getDuration());
         dto.setDifficultyLevel(activitylogEntity.getDifficultyLevel().name());
-        System.out.print(activitylogEntity.getDifficultyLevel().name());
         dto.setResult(activitylogEntity.getResult());
         dto.setUser(convertToUserDto(activitylogEntity.getUser()));
 
@@ -78,6 +82,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
     public void deleteActivityLog(Integer id) {
         activityLogRepository.deleteById(id);
+        logService.log("WARN", "ActivityLog deleted: " + id);
     }
 
     public ActivityLog updateActivityLog(Integer id, ActivityLog activityLog) {
@@ -91,11 +96,14 @@ public class ActivityLogServiceImpl implements ActivityLogService {
         existingActivity.setCreatedAt(activityLog.getCreatedAt());
 
          activityLogRepository.save(existingActivity);
-         return findById(existingActivity.getId());
+
+        logService.log("INFO", "ActivityLog updated: " + id);
+        return findById(existingActivity.getId());
     }
 
     ActivityLog findById(Integer id){
-         ActivitylogEntity activitylogEntity = activityLogRepository.findById(id)
+        logService.log("INFO", "Fetched activity with id: " + id);
+        ActivitylogEntity activitylogEntity = activityLogRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Program not found"));
          return convertToDto(activitylogEntity);
     }

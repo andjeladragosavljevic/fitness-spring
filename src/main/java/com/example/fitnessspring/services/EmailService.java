@@ -23,4 +23,13 @@ public class EmailService {
 
         mailSender.send(message);
     }
+
+    public void sendActivationEmail(String to, String activationLink) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Account Activation");
+        message.setText("Please click the following link to activate your account: " + activationLink);
+        message.setFrom("andjadragos@icloud.com");
+        mailSender.send(message);
+    }
 }

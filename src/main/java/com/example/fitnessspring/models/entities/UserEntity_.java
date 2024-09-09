@@ -8,5 +8,5 @@ public class UserEntity_ {
     public static volatile SingularAttribute<UserEntity, Integer> id;
     public static volatile SingularAttribute<UserEntity, String> username;
     public static volatile SingularAttribute<UserEntity, String> email;
-    //
+
 }

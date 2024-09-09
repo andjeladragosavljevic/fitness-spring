@@ -27,9 +27,9 @@ public class DailyEmailService {
         this.emailService = emailService;
     }
 
-    //
-    //@Scheduled(cron = "0 0 9 * * ?") // Svaki dan u 9:00
-    @Scheduled(cron = "0 35 18 * * ?")
+
+    @Scheduled(cron = "0 0 9 * * ?") // Svaki dan u 9:00
+    //@Scheduled(cron = "0 35 18 * * ?")
     public void sendDailyEmails() {
         List<SubscriptionEntity> subscriptions = subscriptionRepository.findAll();
 

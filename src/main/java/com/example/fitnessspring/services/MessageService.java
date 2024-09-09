@@ -7,8 +7,10 @@ import java.util.List;
 
 @Service
 public interface MessageService {
-    public Message save(Message message);
-    public List<Message> findAllByReceiverId(Integer receiverId);
+    Message sendMessage(Message message);
+    List<Message> getChatHistory(Integer senderId, Integer receiverId);
+    public void sendMessageToAdvisor(Integer advisorId, String content, Integer userId);
 
 
-}
+
+    }

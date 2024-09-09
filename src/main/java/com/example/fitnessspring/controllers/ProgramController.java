@@ -12,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Map;
 
 @RestController
@@ -27,37 +25,25 @@ public class ProgramController {
 
     }
 
-    @GetMapping
-    public Page<Program> getPrograms(Pageable pageable, @AuthenticationPrincipal User user) {
+    @GetMapping("/my-programs/{userId}")
+    public Page<Program> getMyPrograms(@RequestParam Map<String, String> filters, Pageable pageable, @PathVariable Integer userId) {
 
-        return programService.findProgramsByUserIdNot(pageable, 41);
-    }
-
-
-    @GetMapping("/my-programs")
-    public Page<Program> getMyPrograms(@RequestParam Map<String, String> filters, Pageable pageable) {
-        Integer userId = getCurrentUserId();  // Metoda za dobijanje trenutno prijavljenog korisnika
         ProgramFilterDTO filterDTO = new ProgramFilterDTO(filters);
         return programService.filterPrograms(filterDTO, pageable, userId, true);
 
     }
 
 
-    @GetMapping("/other-programs")
-    public Page<Program> getOtherPrograms(@RequestParam Map<String, String> filters, Pageable pageable) {
-        Integer userId = getCurrentUserId();  // Metoda za dobijanje trenutno prijavljenog korisnika
+    @GetMapping("/other-programs/{userId}")
+    public Page<Program> getOtherPrograms(@RequestParam Map<String, String> filters, Pageable pageable, @PathVariable Integer userId) {
         ProgramFilterDTO filterDTO = new ProgramFilterDTO(filters);
         return programService.filterPrograms(filterDTO, pageable, userId, false);
     }
 
-    private Integer getCurrentUserId() {
-        // Implementacija za dobijanje ID-a trenutno prijavljenog korisnika
-        return 41; // Placeholder
-    }
+
 
     @PostMapping
     public ResponseEntity<Program> createProgram(@RequestBody Program program) {
-
         return ResponseEntity.ok(programService.save(program));
     }
 

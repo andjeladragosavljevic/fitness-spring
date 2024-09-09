@@ -5,11 +5,11 @@ import com.example.fitnessspring.models.entities.*;
 import com.example.fitnessspring.repositories.AttributeRepository;
 import com.example.fitnessspring.repositories.ImageRepository;
 import com.example.fitnessspring.repositories.ProgramRepository;
+import com.example.fitnessspring.services.LogService;
 import com.example.fitnessspring.services.ProgramService;
 import com.example.fitnessspring.util.CustomConverters;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,10 @@ public class ProgramServiceImpl implements ProgramService {
     private final ModelMapper modelMapper;
     private final ProgramRepository programRepository;
 
-    public ProgramServiceImpl(ModelMapper modelMapper, ProgramRepository programRepository, AttributeRepository attributeRepository, ImageRepository imageRepository) {
+    private final LogService logService;
+
+    public ProgramServiceImpl(ModelMapper modelMapper, ProgramRepository programRepository, AttributeRepository attributeRepository, ImageRepository imageRepository, LogService logService) {
+        this.logService = logService;
         this.modelMapper = CustomConverters.configureModelMapper();
         this.programRepository = programRepository;
         this.attributeRepository = attributeRepository;
@@ -41,12 +44,16 @@ public class ProgramServiceImpl implements ProgramService {
 
 
     public Page<Program> findAll(Pageable pageable) {
+        logService.log("INFO", "Fetched all programs");
+
         Page<FitnessProgramEntity> programsPage = programRepository.findAll(pageable);
-        return programsPage.map(a -> modelMapper.map(a, Program.class)); //.collect(Collectors.toList());
+        return programsPage.map(a -> modelMapper.map(a, Program.class));
     }
 
 
     public Program findById(Integer id) {
+        logService.log("INFO", "Fetched activities with id: " + id);
+
         FitnessProgramEntity programEntity = programRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Program not found"));
 
@@ -143,6 +150,9 @@ public class ProgramServiceImpl implements ProgramService {
 
 
         entity = programRepository.saveAndFlush(entity);
+
+        logService.log("INFO", "Program added: " + entity.getId());
+
         return findById(entity.getId());
 
     }
@@ -152,11 +162,13 @@ public class ProgramServiceImpl implements ProgramService {
 
     public Page<Program> findProgramsByUserId(Pageable pageable, Integer userId) {
         Page<FitnessProgramEntity> programsPage = programRepository.findFitnessProgramEntitiesByUserId(pageable, userId);
-        return programsPage.map(a -> modelMapper.map(a, Program.class)); //.collect(Collectors.toList());
+        return programsPage.map(a -> modelMapper.map(a, Program.class)); 
 
     }
 
     public Page<Program> findProgramsByUserIdNot(Pageable pageable, Integer userId) {
+        logService.log("INFO", "Fetched programs for user: " + userId);
+
         Page<FitnessProgramEntity> programsPage = programRepository.findFitnessProgramEntityByUserIdNot(pageable, userId);
         return programsPage.map(a -> modelMapper.map(a, Program.class));
     }
@@ -213,6 +225,8 @@ public class ProgramServiceImpl implements ProgramService {
 
         FitnessProgramEntity savedProgram = programRepository.saveAndFlush(existingProgram);
 
+        logService.log("INFO", "Program updated: " + id);
+
         return findById(savedProgram.getId());
     }
 
@@ -256,7 +270,9 @@ public class ProgramServiceImpl implements ProgramService {
 
     @Override
     public void deleteProgram(Integer id) {
+
         programRepository.deleteById(id);
+        logService.log("WARN", "Program deleted: " + id);
     }
 
 

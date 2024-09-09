@@ -1,6 +1,7 @@
 package com.example.fitnessspring.controllers;
 
 import com.example.fitnessspring.models.entities.Message;
+import com.example.fitnessspring.models.entities.MessageDTO;
 import com.example.fitnessspring.services.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,16 +20,19 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-    @PostMapping("/send")
-    public ResponseEntity<Message> sendMessage(@RequestBody Message message) {
-        Message sentMessage = messageService.save(message);
-        return new ResponseEntity<>(sentMessage, HttpStatus.OK);
+    @GetMapping("/chat/{senderId}/{receiverId}")
+    public List<Message> getChatHistory(@PathVariable Integer senderId, @PathVariable Integer receiverId) {
+        return messageService.getChatHistory(senderId, receiverId);
     }
 
-    @GetMapping("/{receiverId}")
-    public ResponseEntity<List<Message>> getMessagesBetweenUsers(
-           @PathVariable Integer receiverId) {
-        List<Message> messages = messageService.findAllByReceiverId(receiverId);
-        return new ResponseEntity<>(messages, HttpStatus.OK);
+    @PostMapping("/send")
+    public ResponseEntity<String> sendMessageToAdvisor(@RequestBody MessageDTO messageDTO) {
+        messageService.sendMessageToAdvisor(messageDTO.getAdvisorId(), messageDTO.getContent(), messageDTO.getSenderId());
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping
+    public Message sendMessage(@RequestBody Message message) {
+        return messageService.sendMessage(message);
     }
 }

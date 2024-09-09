@@ -14,9 +14,10 @@ public class AdminEntity {
     @Id
     @Column(name = "id", nullable = false)
     private Integer id;
+    @Enumerated(EnumType.STRING)
     @Basic
     @Column(name = "role", nullable = true)
-    private Object role;
+    private Role role;
     @Basic
     @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
@@ -31,5 +32,9 @@ public class AdminEntity {
     private String password;
     @OneToMany(mappedBy = "admin")
     private List<MessagetoadvisorEntity> messagetoadvisors;
+
+    public enum Role {
+        Admin, Advisor
+    }
 
 }

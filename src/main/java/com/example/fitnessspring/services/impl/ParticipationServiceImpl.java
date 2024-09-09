@@ -5,6 +5,7 @@ import com.example.fitnessspring.repositories.ParticipationRepository;
 import com.example.fitnessspring.repositories.PaymentMethodRepository;
 import com.example.fitnessspring.repositories.ProgramRepository;
 import com.example.fitnessspring.repositories.UserRepository;
+import com.example.fitnessspring.services.LogService;
 import com.example.fitnessspring.services.ParticipationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -29,13 +30,15 @@ public class ParticipationServiceImpl implements ParticipationService {
     UserRepository userRepository;
     final
     ProgramRepository programRepository;
+    private final LogService logService;
 
-    public ParticipationServiceImpl(ParticipationRepository participationRepository, ModelMapper modelMapper, UserRepository userRepository, ProgramRepository programRepository, PaymentMethodRepository paymentMethodRepository) {
+    public ParticipationServiceImpl(ParticipationRepository participationRepository, ModelMapper modelMapper, UserRepository userRepository, ProgramRepository programRepository, PaymentMethodRepository paymentMethodRepository, LogService logService) {
         this.participationRepository = participationRepository;
         this.modelMapper = modelMapper;
         this.userRepository = userRepository;
         this.programRepository = programRepository;
         this.paymentMethodRepository = paymentMethodRepository;
+        this.logService = logService;
     }
 
 
@@ -45,8 +48,6 @@ public class ParticipationServiceImpl implements ParticipationService {
         UserEntity userEntity = userRepository.findById(participation.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));
         FitnessProgramEntity programEntity = programRepository.findById(participation.getFitnessprogramId()).orElseThrow(() -> new RuntimeException("Program not found"));
         PaymentmethodEntity paymentmethodEntity =  paymentMethodRepository.findById(participation.getPaymentMethodId()).orElseThrow(() -> new RuntimeException("Payment method not found"));
-
-        System.out.print(userEntity.getId());
 
         if (participationRepository.existsByUserAndFitnessprogram(userEntity, programEntity)) {
             throw new RuntimeException("User already participating in this program");
@@ -58,18 +59,17 @@ public class ParticipationServiceImpl implements ParticipationService {
 
         entity = participationRepository.saveAndFlush(entity);
 
+        logService.log("INFO", "Participation added: " + entity.getId());
+
 
         return modelMapper.map(entity, Participation.class);
     }
 
     @Override
     public List<Participation> getUserParticipations(Integer userId, boolean current) {
-//        List<ParticipationEntity> participations = participationRepository.getParticipationEntitiesByUserId(userId);
-//        return participations.stream()
-//                .map(this::convertToDto)
-//                .collect(Collectors.toList());
-
         LocalDate today = LocalDate.now();
+        logService.log("INFO", "Fetched participations for user: " + userId);
+
         if (current) {
             return participationRepository.findByUserIdAndFitnessprogramEndDateAfter(userId, today)
                     .stream().map(this::convertToDto).collect(Collectors.toList());
@@ -77,6 +77,8 @@ public class ParticipationServiceImpl implements ParticipationService {
             return participationRepository.findByUserIdAndFitnessprogramEndDateBefore(userId, today)
                     .stream().map(this::convertToDto).collect(Collectors.toList());
         }
+
+
 
     }
 

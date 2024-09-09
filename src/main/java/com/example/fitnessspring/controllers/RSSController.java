@@ -12,11 +12,11 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URL;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/rss")
 @CrossOrigin(origins = "http://localhost:4200")
 public class RSSController {
 
-    @GetMapping("/rss")
+    @GetMapping()
     public ResponseEntity<String> getTheVergeRss() {
         String rssUrl = "https://feeds.feedburner.com/AceFitFacts.xml";
         RestTemplate restTemplate = new RestTemplate();
